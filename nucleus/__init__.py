@@ -4,10 +4,17 @@ import logging
 import os
 import sys
 import datetime
+import warnings
+
 
 MODULE_PATH = os.path.dirname(os.path.realpath(__file__))
 REPO_PATH = os.path.dirname(MODULE_PATH)
 PARENT_PATH = os.path.abspath(os.path.join(REPO_PATH, os.pardir))
+SQL_HOST = 'SQL_HOST'
+SQL_USERNAME = 'SQL_USERNAME'
+SQL_PASSWORD = 'SQL_USERNAME'
+
+engine = None
 
 # Local storage path
 DATA_PATH = f"{REPO_PATH}/data/"
@@ -23,3 +30,41 @@ logger.setLevel(logging.DEBUG)
 
 # Get today's date
 LOAD_DATE: str = datetime.datetime.now().strftime('%Y-%m-%d')
+
+
+def set_engine(_engine):
+    """
+    Establish an engine object to connect to SQL server
+    """
+    global engine
+    engine = _engine
+
+
+def get_engine():
+    """
+    Get the current engine
+    """
+    if engine is None:
+        warnings.warn("Session is None, make sure to initilise the engine with set_engine().")
+
+
+def get_connection():
+    """
+    Get the current session
+
+    Returns
+        pypyodbc.Connection: The current connection object
+    """
+    if engine is None:
+        warnings.warn("Session is None, make sure to initilise the engine with set_engine().")
+    return engine.connect()
+
+
+def disconnect_engine():
+    """
+    Close the current session
+    """
+    if engine is None:
+        warnings.warn("No engine has been initilised yet!")
+    engine.disconnect()
+
