@@ -6,13 +6,11 @@ import sys
 import datetime
 import warnings
 
-
 MODULE_PATH = os.path.dirname(os.path.realpath(__file__))
 REPO_PATH = os.path.dirname(MODULE_PATH)
 PARENT_PATH = os.path.abspath(os.path.join(REPO_PATH, os.pardir))
-SQL_HOST = 'SQL_HOST'
-SQL_USERNAME = 'SQL_USERNAME'
-SQL_PASSWORD = 'SQL_USERNAME'
+DRIVER_NAME = 'DRIVER_NAME'
+SERVER_NAME = 'SERVER_NAME'
 
 engine = None
 

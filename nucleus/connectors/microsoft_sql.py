@@ -1,7 +1,7 @@
 import logging
 import os
 import nucleus.connectors.engine.odbc as odbc
-from nucleus import SQL_HOST, SQL_USERNAME, SQL_PASSWORD
+from nucleus import DRIVER_NAME, SERVER_NAME
 
 log = logging.getLogger(__name__)
 
@@ -21,34 +21,36 @@ class MicrosoftSqlConnector:
         """
         _value = os.getenv(key)
         if _value is None:
-            raise Exception(f"Enviroment variable {key} does not exist.")
+            raise Exception(f"Environment variable {key} does not exist.")
 
         return _value
     
 
-    def get_engine(self, **kwargs):
+    def get_engine(self, database: str = None, **kwargs):
         """
         Creates and returns a pypyodbc engine. This will allow you to connect to the SQL server and be able to query the data.
         Credentials are discovered from the saved environmental variables. This current iteration of connection handlers is not
-        intended for online SQL hosting use as it would need to be more secure.
+        intended for online SQL hosting use as it would need to be more secure. The user will need to point to which database they would like to access
 
         Parameters:
+            database (str): The database to create a connection object to.
             kwargs (dict): The provided credentials needed for a successful connection, else defaults to env var. Intended to be useful
             if the user has more than one account.
 
         Returns:
             Engine: engine
         """
+        if database is None:
+            log.error("Database hasn't been specified. Please define which database you want to access")
         # Assign values needed to establish the engine
-        host = self.get_env_var(kwargs.get('host') if kwargs.get('host') else SQL_HOST)
-        username = self.get_env_var(kwargs.get('username') if kwargs.get('username') else SQL_USERNAME)
-        password = self.get_env_var(kwargs.get('password') if kwargs.get('password') else SQL_PASSWORD)
+        driver = self.get_env_var(kwargs.get('driver') if kwargs.get('driver') else DRIVER_NAME)
+        server = self.get_env_var(kwargs.get('server') if kwargs.get('server') else SERVER_NAME)
 
         # Packs credentials
         credentials = {
-            'host': host,
-            'username': username,
-            'password': password,
+            'driver': driver,
+            'server': server,
+            'database': database,
         }
         
         return odbc.OdbcEngine(**credentials)

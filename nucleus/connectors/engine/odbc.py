@@ -9,20 +9,18 @@ class OdbcEngine:
     This class is used to connect to the MicroSoft SQL database by returning the connection object. 
     """
 
-    def __init__(self, host=None, database=None, username=None, password=None):
+    def __init__(self, driver=None, server=None, database=None):
         """
         Initialise the engine object with host, username and password.
 
         Parameters:
-            host (str, optional): Server name or IP address of the server.
+            driver (str, optional): The driver name
+            server (str, optional): The server name
             database (str, optional): Name of the database to access
-            username (str, optional): The username for MicroSoft SQL Server
-            password (str, optional): The password for MicroSoft SQL Server
         """
-        self.host = host
+        self.driver = driver
+        self.server = server
         self.database = database
-        self.username = username
-        self.password = password
         self.connection = None
 
 
@@ -37,15 +35,19 @@ class OdbcEngine:
 
         # Attempt to use credential to connect to the specified server and database
         try:
-            conn = odbc.connect(f"DRIVER=ODBC Driver 17 for SQL Server;
-                        SERVER={self.host};
-                        DATABASE={self.database};
-                        UID={self.username};
-                        PWD={self.password};
-                        Trust_Connection=yes;")
-            log.info("Connection established successfully.")
+            conn = odbc.connect(f"""
+                        DRIVER={{{self.driver}}};
+                        SERVER={{{self.server}}};
+                        DATABASE={{{self.database}}};
+                        Trust_Connection=yes;""")
+            log.info("Connection established successfully.""")
             return conn
         except Exception as e:
+            log.info(f"""
+                        DRIVER={{{self.driver}}};
+                        SERVER={{{self.server}}};
+                        DATABASE={{{self.database}}};
+                        Trust_Connection=yes;""")
             log.error(f"Error connecting to the database: {str(e)}")
             return None
 
